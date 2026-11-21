@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Delete Your Account | Edinno</title>
+<meta name="description" content="Request deletion of your Edinno account and associated data." />
+<style>
+  /* ===== Edinno palette — replace these hex values with the official brand codes ===== */
+  :root {
+    --edinno-primary: #2B2D7C;       /* deep indigo – headings, primary brand */
+    --edinno-primary-light: #EEF0FB; /* soft indigo tint – backgrounds */
+    --edinno-accent: #F5A623;        /* warm amber – highlights */
+    --edinno-teal: #14A39A;          /* teal – success states */
+    --edinno-danger: #D93838;        /* red – destructive CTA */
+    --edinno-danger-dark: #B52A2A;
+    --text: #1E2033;
+    --muted: #5D6178;
+    --border: #DCDFEC;
+    --surface: #FFFFFF;
+    --radius: 14px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--edinno-primary-light);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    background: var(--edinno-primary);
+    padding: 18px 24px;
+  }
+  .brand {
+    max-width: 640px; margin: 0 auto;
+    color: #fff; font-weight: 800; font-size: 1.5rem; letter-spacing: .3px;
+  }
+  .brand span { color: var(--edinno-accent); }
+
+  main { flex: 1; padding: 32px 16px 48px; }
+  .card {
+    max-width: 640px; margin: 0 auto;
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: 0 8px 30px rgba(43, 45, 124, .08);
+    padding: 32px 28px;
+  }
+  h1 { color: var(--edinno-primary); font-size: 1.6rem; line-height: 1.3; margin-bottom: 12px; }
+  h2 { color: var(--edinno-primary); font-size: 1.05rem; margin: 24px 0 8px; }
+  p  { color: var(--muted); margin-bottom: 12px; }
+  ul { padding-left: 20px; color: var(--muted); }
+  li { margin-bottom: 6px; }
+
+  .notice {
+    background: #FFF7E8;
+    border-left: 4px solid var(--edinno-accent);
+    border-radius: 8px;
+    padding: 12px 14px;
+    color: #6B4A0E;
+    font-size: .94rem;
+    margin: 20px 0;
+  }
+
+  form { margin-top: 24px; }
+  label.field { display: block; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+  input[type="text"], textarea {
+    width: 100%; padding: 12px 14px; font-size: 1rem;
+    border: 1.5px solid var(--border); border-radius: 10px;
+    font-family: inherit; color: var(--text); background: #fff;
+  }
+  input[type="text"]:focus, textarea:focus {
+    outline: none; border-color: var(--edinno-primary);
+    box-shadow: 0 0 0 3px rgba(43, 45, 124, .15);
+  }
+  textarea { resize: vertical; min-height: 80px; }
+  .group { margin-bottom: 18px; }
+  .hint { font-size: .85rem; color: var(--muted); margin-top: 4px; }
+  .error { font-size: .85rem; color: var(--edinno-danger); margin-top: 4px; display: none; }
+
+  .check { display: flex; gap: 10px; align-items: flex-start; font-size: .95rem; color: var(--text); }
+  .check input { margin-top: 5px; width: 18px; height: 18px; accent-color: var(--edinno-danger); flex-shrink: 0; }
+
+  .btn {
+    display: inline-block; width: 100%;
+    padding: 14px 20px; font-size: 1rem; font-weight: 700;
+    border: none; border-radius: 10px; cursor: pointer;
+    transition: background .15s, opacity .15s;
+  }
+  .btn-danger { background: var(--edinno-danger); color: #fff; margin-top: 8px; }
+  .btn-danger:hover:not(:disabled) { background: var(--edinno-danger-dark); }
+  .btn-danger:disabled { opacity: .45; cursor: not-allowed; }
+  .btn-secondary { background: var(--edinno-primary-light); color: var(--edinno-primary); }
+  .btn-secondary:hover { background: #E1E4F7; }
+
+  /* Confirm modal */
+  .overlay {
+    position: fixed; inset: 0; background: rgba(20, 22, 60, .55);
+    display: none; align-items: center; justify-content: center; padding: 16px; z-index: 10;
+  }
+  .overlay.open { display: flex; }
+  .modal {
+    background: #fff; border-radius: var(--radius); max-width: 420px; width: 100%;
+    padding: 28px 24px; text-align: center;
+  }
+  .modal h3 { color: var(--edinno-primary); font-size: 1.25rem; margin-bottom: 8px; }
+  .modal .actions { display: flex; gap: 10px; margin-top: 20px; }
+  .modal .actions .btn { margin-top: 0; }
+
+  /* Success state */
+  .success { display: none; text-align: center; padding: 12px 0; }
+  .success .icon {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: var(--edinno-teal); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 18px; font-size: 2.2rem; font-weight: 700;
+  }
+  .ref {
+    display: inline-block; margin: 8px 0 16px; padding: 8px 14px;
+    background: var(--edinno-primary-light); color: var(--edinno-primary);
+    border-radius: 8px; font-weight: 700; letter-spacing: .5px;
+  }
+
+  footer { text-align: center; font-size: .85rem; color: var(--muted); padding: 20px 16px 28px; }
+  footer a { color: var(--edinno-primary); }
+
+  .spinner {
+    display: inline-block; width: 16px; height: 16px; vertical-align: -3px; margin-right: 8px;
+    border: 2px solid rgba(255,255,255,.5); border-top-color: #fff; border-radius: 50%;
+    animation: spin .7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<header><div class="brand">Edi<span>nno</span></div></header>
+
+<main>
+  <div class="card">
+
+    <!-- ===== Request view ===== -->
+    <section id="requestView">
+      <h1>Delete your Edinno account</h1>
+      <p>We're sorry to see you go. You can use this page to ask us to permanently delete your Edinno account and the data linked to it.</p>
+
+      <h2>What will be deleted</h2>
+      <ul>
+        <li>Your profile (name, email, mobile number, profile photo)</li>
+        <li>Your learning progress, course history, scores and certificates</li>
+        <li>Your saved content, notes and app preferences</li>
+      </ul>
+
+      <h2>What we may keep</h2>
+      <ul>
+        <li>Payment and invoice records, for up to the period required by tax and accounting law</li>
+        <li>Anonymised usage data that can no longer identify you</li>
+      </ul>
+
+      <div class="notice">
+        <strong>This cannot be undone.</strong> Your request will be processed within 30 days. Any active subscription will be cancelled and unused balance will not be refunded once deletion is complete.
+      </div>
+
+      <form id="deleteForm" novalidate>
+        <div class="group">
+          <label class="field" for="identifier">Registered email or mobile number</label>
+          <input type="text" id="identifier" name="identifier" autocomplete="email" placeholder="e.g. you@example.com or 9876543210" required />
+          <div class="hint">Use the same email or number you sign in to the Edinno app with.</div>
+          <div class="error" id="identifierError">Please enter a valid email address or 10-digit mobile number.</div>
+        </div>
+
+        <div class="group">
+          <label class="field" for="reason">Reason for leaving <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+          <textarea id="reason" name="reason" placeholder="Tell us how we could do better"></textarea>
+        </div>
+
+        <div class="group">
+          <label class="field" for="human">Quick check: what is <span id="mathQ"></span>?</label>
+          <input type="text" id="human" inputmode="numeric" autocomplete="off" placeholder="Your answer" required />
+          <div class="error" id="humanError">That's not quite right. Please try again.</div>
+        </div>
+
+        <!-- Honeypot: hidden from people, bots tend to fill it. Don't remove. -->
+        <div aria-hidden="true" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;">
+          <label for="website">Leave this field empty</label>
+          <input type="text" id="website" name="_honey" tabindex="-1" autocomplete="off" />
+        </div>
+
+        <div class="group">
+          <label class="check">
+            <input type="checkbox" id="consent" />
+            <span>I understand that my Edinno account and its data will be permanently deleted.</span>
+          </label>
+        </div>
+
+        <button type="submit" class="btn btn-danger" id="deleteBtn" disabled>Delete my account</button>
+      </form>
+    </section>
+
+    <!-- ===== Success view ===== -->
+    <section id="successView" class="success" aria-live="polite">
+      <div class="icon">✓</div>
+      <h1>Request submitted</h1>
+      <p>Your account deletion request has been received. Your account and associated data will be deleted within 30 days.</p>
+      <div class="ref" id="refId">REF-000000</div>
+      <p>We'll send a confirmation to <strong id="sentTo"></strong> once it's done. If you didn't make this request, please contact us right away at <a href="mailto:info@edinnoverse.in">info@edinnoverse.in</a>.</p>
+    </section>
+
+  </div>
+</main>
+
+<!-- ===== Confirmation modal ===== -->
+<div class="overlay" id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+  <div class="modal">
+    <h3 id="confirmTitle">Are you sure?</h3>
+    <p>Your Edinno account and all its data will be permanently deleted. This can't be undone.</p>
+    <div class="actions">
+      <button class="btn btn-secondary" id="cancelBtn" type="button">Cancel</button>
+      <button class="btn btn-danger" id="confirmBtn" type="button">Yes, delete</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Need help? Contact <a href="mailto:info@edinnoverse.in">info@edinnoverse.in</a> · <a href="#">Privacy Policy</a><br />
+  © <span id="year"></span> Edinno. All rights reserved.
+</footer>
+
+<script>
+  // Requests are emailed via FormSubmit (https://formsubmit.co) — no backend or API key needed.
+  // One-time setup: the FIRST submission sends an activation email to the address below;
+  // click "Activate Form" in that email, and every later submission is delivered.
+  // After activating, you can replace the email in this URL with the random alias string
+  // FormSubmit gives you, so the address isn't visible in the page source.
+  const RECIPIENT = "info@edinnoverse.in";
+  const FORM_ENDPOINT = "https://formsubmit.co/ajax/" + RECIPIENT;
+
+  const form = document.getElementById("deleteForm");
+  const identifier = document.getElementById("identifier");
+  const consent = document.getElementById("consent");
+  const deleteBtn = document.getElementById("deleteBtn");
+  const idError = document.getElementById("identifierError");
+  const modal = document.getElementById("confirmModal");
+  const confirmBtn = document.getElementById("confirmBtn");
+  const cancelBtn = document.getElementById("cancelBtn");
+
+  document.getElementById("year").textContent = new Date().getFullYear();
+
+  // ---- Anti-spam (all client-side, no backend) ----
+  const human = document.getElementById("human");
+  const humanError = document.getElementById("humanError");
+  const honeypot = document.getElementById("website");
+  const pageLoadedAt = Date.now();
+  const MIN_FILL_MS = 4000;              // humans take longer than 4s to fill the form
+  const COOLDOWN_MS = 10 * 60 * 1000;    // one request per browser every 10 minutes
+  const COOLDOWN_KEY = "edinno_del_req_at";
+  let mathAnswer;
+
+  function newMathQuestion() {
+    const a = 2 + Math.floor(Math.random() * 8), b = 2 + Math.floor(Math.random() * 8);
+    mathAnswer = a + b;
+    document.getElementById("mathQ").textContent = a + " + " + b;
+    human.value = "";
+  }
+  newMathQuestion();
+  human.addEventListener("input", () => { humanError.style.display = "none"; });
+
+  const looksLikeBot = () => honeypot.value.trim() !== "" || (Date.now() - pageLoadedAt) < MIN_FILL_MS;
+
+  function inCooldown() {
+    try { return Date.now() - Number(localStorage.getItem(COOLDOWN_KEY) || 0) < COOLDOWN_MS; }
+    catch (e) { return false; }
+  }
+  function startCooldown() {
+    try { localStorage.setItem(COOLDOWN_KEY, String(Date.now())); } catch (e) {}
+  }
+
+  const isValid = v => {
+    v = v.trim();
+    const email = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phone = /^(\+?91[-\s]?)?[6-9]\d{9}$/;
+    return email.test(v) || phone.test(v.replace(/\s/g, ""));
+  };
+
+  const refresh = () => { deleteBtn.disabled = !(consent.checked && identifier.value.trim()); };
+  consent.addEventListener("change", refresh);
+  identifier.addEventListener("input", () => { idError.style.display = "none"; refresh(); });
+
+  form.addEventListener("submit", e => {
+    e.preventDefault();
+    if (!isValid(identifier.value)) { idError.style.display = "block"; identifier.focus(); return; }
+    if (parseInt(human.value.trim(), 10) !== mathAnswer) {
+      humanError.style.display = "block"; newMathQuestion(); human.focus(); return;
+    }
+    if (inCooldown()) {
+      alert("A deletion request was already submitted from this device in the last few minutes. Please wait before trying again, or email info@edinnoverse.in.");
+      return;
+    }
+    modal.classList.add("open");
+    confirmBtn.focus();
+  });
+
+  cancelBtn.addEventListener("click", () => modal.classList.remove("open"));
+  modal.addEventListener("click", e => { if (e.target === modal) modal.classList.remove("open"); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape") modal.classList.remove("open"); });
+
+  confirmBtn.addEventListener("click", async () => {
+    confirmBtn.disabled = true; cancelBtn.disabled = true;
+    confirmBtn.innerHTML = '<span class="spinner"></span>Submitting…';
+
+    const ref = "REF-" + Date.now().toString(36).toUpperCase();
+    const user = identifier.value.trim();
+    const requestedAt = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }) + " IST";
+
+    // Fields below appear as rows in the email; keys starting with "_" are FormSubmit settings.
+    const payload = {
+      "Reference ID": ref,
+      "Email / Mobile": user,
+      "Reason for leaving": document.getElementById("reason").value.trim() || "Not provided",
+      "Requested at": requestedAt,
+      "Page": window.location.href,
+      _subject: "Account deletion request – " + user + " (" + ref + ")",
+      _template: "table",
+      _captcha: "false"
+    };
+    // If the user entered an email, "Reply" in the inbox goes straight to them.
+    if (user.includes("@")) payload._replyto = user;
+
+    payload._honey = honeypot.value; // FormSubmit also discards submissions where this is filled
+
+    // Bots get a fake success screen so they don't retry; nothing is sent.
+    if (looksLikeBot()) { showSuccess(ref, user); return; }
+
+    try {
+      const res = await fetch(FORM_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || String(data.success) !== "true") throw new Error(data.message || "Request failed");
+      startCooldown();
+      showSuccess(ref, user);
+    } catch (err) {
+      console.error("Deletion request failed:", err);
+      alert("Something went wrong while submitting your request. Please try again or email info@edinnoverse.in.");
+      confirmBtn.disabled = false; cancelBtn.disabled = false;
+      confirmBtn.textContent = "Yes, delete";
+    }
+  });
+
+  function showSuccess(ref, who) {
+    modal.classList.remove("open");
+    document.getElementById("requestView").style.display = "none";
+    document.getElementById("refId").textContent = ref;
+    document.getElementById("sentTo").textContent = who;
+    document.getElementById("successView").style.display = "block";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+</script>
+</body>
+</html>

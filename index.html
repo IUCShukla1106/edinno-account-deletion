@@ -207,7 +207,7 @@
       <h1>Request submitted</h1>
       <p>Your account deletion request has been received. Your account and associated data will be deleted within 30 days.</p>
       <div class="ref" id="refId">REF-000000</div>
-      <p>We'll send a confirmation to <strong id="sentTo"></strong> once it's done. If you didn't make this request, please contact us right away at <a href="mailto:info@edinnoverse.in">info@edinnoverse.in</a>.</p>
+      <p>We'll send a confirmation to <strong id="sentTo"></strong> once it's done. If you didn't make this request, please contact us right away at <a href="mailto:info@edinno.in">info@edinno.in</a>.</p>
     </section>
 
   </div>
@@ -226,7 +226,7 @@
 </div>
 
 <footer>
-  Need help? Contact <a href="mailto:info@edinnoverse.in">info@edinnoverse.in</a> · <a href="#">Privacy Policy</a><br />
+  Need help? Contact <a href="mailto:info@edinno.in">info@edinno.in</a> · <a href="#">Privacy Policy</a><br />
   © <span id="year"></span> Edinno. All rights reserved.
 </footer>
 
@@ -236,7 +236,7 @@
   // click "Activate Form" in that email, and every later submission is delivered.
   // After activating, you can replace the email in this URL with the random alias string
   // FormSubmit gives you, so the address isn't visible in the page source.
-  const RECIPIENT = "info@edinnoverse.in";
+  const RECIPIENT = "info@edinno.in";
   const FORM_ENDPOINT = "https://formsubmit.co/ajax/" + RECIPIENT;
 
   const form = document.getElementById("deleteForm");
@@ -297,7 +297,7 @@
       humanError.style.display = "block"; newMathQuestion(); human.focus(); return;
     }
     if (inCooldown()) {
-      alert("A deletion request was already submitted from this device in the last few minutes. Please wait before trying again, or email info@edinnoverse.in.");
+      alert("A deletion request was already submitted from this device in the last few minutes. Please wait before trying again, or email info@edinno.in.");
       return;
     }
     modal.classList.add("open");
@@ -347,7 +347,7 @@
       showSuccess(ref, user);
     } catch (err) {
       console.error("Deletion request failed:", err);
-      alert("Something went wrong while submitting your request. Please try again or email info@edinnoverse.in.");
+      alert("Something went wrong while submitting your request. Please try again or email info@edinno.in.");
       confirmBtn.disabled = false; cancelBtn.disabled = false;
       confirmBtn.textContent = "Yes, delete";
     }

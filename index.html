@@ -110,6 +110,19 @@
   .modal h3 { color: var(--edinno-primary); font-size: 1.25rem; margin-bottom: 8px; }
   .modal .actions { display: flex; gap: 10px; margin-top: 20px; }
   .modal .actions .btn { margin-top: 0; }
+  .modal-error, .banner-error {
+    display: none;
+    text-align: left;
+    background: #FDECEC;
+    border-left: 4px solid var(--edinno-danger);
+    border-radius: 8px;
+    padding: 12px 14px;
+    color: #7A1E1E;
+    font-size: .92rem;
+    line-height: 1.45;
+  }
+  .modal-error { margin-top: 16px; }
+  .banner-error { margin-bottom: 14px; }
 
   /* Success state */
   .success { display: none; text-align: center; padding: 12px 0; }
@@ -197,6 +210,7 @@
           </label>
         </div>
 
+        <div class="banner-error" id="formError" role="alert"></div>
         <button type="submit" class="btn btn-danger" id="deleteBtn" disabled>Delete my account</button>
       </form>
     </section>
@@ -218,6 +232,7 @@
   <div class="modal">
     <h3 id="confirmTitle">Are you sure?</h3>
     <p>Your Edinno account and all its data will be permanently deleted. This can't be undone.</p>
+    <div class="modal-error" id="submitError" role="alert"></div>
     <div class="actions">
       <button class="btn btn-secondary" id="cancelBtn" type="button">Cancel</button>
       <button class="btn btn-danger" id="confirmBtn" type="button">Yes, delete</button>
@@ -247,6 +262,8 @@
   const modal = document.getElementById("confirmModal");
   const confirmBtn = document.getElementById("confirmBtn");
   const cancelBtn = document.getElementById("cancelBtn");
+  const formError = document.getElementById("formError");
+  const submitError = document.getElementById("submitError");
 
   document.getElementById("year").textContent = new Date().getFullYear();
 
@@ -290,6 +307,25 @@
   consent.addEventListener("change", refresh);
   identifier.addEventListener("input", () => { idError.style.display = "none"; refresh(); });
 
+  function showNotice(el, message) {
+    el.textContent = message;
+    el.style.display = "block";
+  }
+  function hideNotice(el) {
+    el.style.display = "none";
+    el.textContent = "";
+  }
+
+  // FormSubmit answers failures with HTTP 200 and { success: "false", message }.
+  function submissionErrorMessage(data) {
+    const raw = data && data.message ? String(data.message) : "";
+    if (/activat/i.test(raw)) {
+      return "This form is not activated yet. FormSubmit has emailed an activation link to info@edinno.in. Open that email (check Spam), click Activate Form, then submit again. You can also email info@edinno.in directly.";
+    }
+    if (raw) return raw;
+    return "We couldn't submit your request. Please try again or email info@edinno.in.";
+  }
+
   form.addEventListener("submit", e => {
     e.preventDefault();
     if (!isValid(identifier.value)) { idError.style.display = "block"; identifier.focus(); return; }
@@ -297,9 +333,11 @@
       humanError.style.display = "block"; newMathQuestion(); human.focus(); return;
     }
     if (inCooldown()) {
-      alert("A deletion request was already submitted from this device in the last few minutes. Please wait before trying again, or email info@edinno.in.");
+      showNotice(formError, "A deletion request was already submitted from this device in the last few minutes. Please wait before trying again, or email info@edinno.in.");
       return;
     }
+    hideNotice(formError);
+    hideNotice(submitError);
     modal.classList.add("open");
     confirmBtn.focus();
   });
@@ -342,12 +380,16 @@
         body: JSON.stringify(payload)
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok || String(data.success) !== "true") throw new Error(data.message || "Request failed");
+      if (!res.ok || String(data.success) !== "true") {
+        const failure = new Error(data.message || "Request failed");
+        failure.notice = submissionErrorMessage(data);
+        throw failure;
+      }
       startCooldown();
       showSuccess(ref, user);
     } catch (err) {
       console.error("Deletion request failed:", err);
-      alert("Something went wrong while submitting your request. Please try again or email info@edinno.in.");
+      showNotice(submitError, err.notice || "We couldn't submit your request. Please try again or email info@edinno.in.");
       confirmBtn.disabled = false; cancelBtn.disabled = false;
       confirmBtn.textContent = "Yes, delete";
     }
